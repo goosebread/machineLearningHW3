@@ -19,7 +19,7 @@ def makeDistributions():
     A4=np.random.rand(n,n)-0.5
     S4=np.matmul(A4,A4.T)
 
-    scale = 2
+    scale = 0.6
     m1 = scale * np.array([1,1])
     m2 = scale * np.array([1,-1])
     m3 = scale * np.array([-1,1])
@@ -74,7 +74,7 @@ def makeSamples(N,name):
 
 #run script
 if __name__ == '__main__':
-    #makeDistributions()
+    makeDistributions()
 
     makeSamples(10,"Samples")
     makeSamples(100,"Samples")

@@ -1,7 +1,9 @@
 #def evalPosterior(data, nGaussians, priors, mus, covs)
+from gettext import ngettext
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import multivariate_normal
+from sklearn.covariance import log_likelihood
 
 #this function partitions a dataset into a train and test group 
 #according to the principles of k-fold validation
