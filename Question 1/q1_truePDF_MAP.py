@@ -59,11 +59,13 @@ def runPartA(lossMatrix,title1,title2):
     print("Confusion Matrix: ")
     print(CM)
 
-    #Part 3 Visualizations
-    #separate by true label
+    doVisualization(samples, trueLabels, Decisions, title1, title2)
+
+#Part 3 Visualizations
+#separate by true label
+def doVisualization(samples, trueLabels, Decisions, title1, title2):
     correctDecision = trueLabels==Decisions
     print("Measured Error = "+str(1-np.average(correctDecision)))
-
     data = np.concatenate((samples,trueLabels.T,Decisions.T,correctDecision.T),axis=1)
 
     #this filtering scheme requires a reshape to return to 2d matrix representation
@@ -81,14 +83,17 @@ def runPartA(lossMatrix,title1,title2):
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
     cmap1 = LinearSegmentedColormap.from_list('4class', [(1, 0, 0), (0, 1, 0), (1, 0, 1), (1, 1, 0),(0, 0, 1)])
-
+    legend_elements1 = [ax.scatter([0], [0], marker = 'o',c = 1, label='Label = 1',cmap=cmap1,vmin=1,vmax=4),
+                    ax.scatter([0], [0], marker = 's',c = 2,label='Label = 2',cmap=cmap1,vmin=1,vmax=4),
+                    ax.scatter([0], [0], marker = 'v',c = 3,label='Label = 3',cmap=cmap1,vmin=1,vmax=4),
+                    ax.scatter([0], [0], marker = 'x',c = 4,label='Label = 4',cmap=cmap1,vmin=1,vmax=4)]
     l1=ax.scatter(data1[:,0],data1[:,1],zs=data1[:,2],marker = 'o',c = data1[:,4],label='Label = 1',cmap=cmap1,vmin=1,vmax=4)
     l2=ax.scatter(data2[:,0],data2[:,1],zs=data2[:,2],marker = 's',c = data2[:,4],label='Label = 2',cmap=cmap1,vmin=1,vmax=4)
     l3=ax.scatter(data3[:,0],data3[:,1],zs=data3[:,2],marker = 'v',c = data3[:,4],label='Label = 3',cmap=cmap1,vmin=1,vmax=4)
     l4=ax.scatter(data4[:,0],data4[:,1],zs=data4[:,2],marker = 'x',c = data4[:,4],label='Label = 4',cmap=cmap1,vmin=1,vmax=4)
 
     ax.set_title(title1)
-    ax.legend(handles=[l1,l2,l3,l4],title="Shape = True Label\nColor = ERM Decision")
+    ax.legend(handles=legend_elements1,title="Shape = True Label\nColor = Classifier Decision")
 
 
     #plot Error vs Actual Label
@@ -97,18 +102,22 @@ def runPartA(lossMatrix,title1,title2):
     ax2 = fig2.add_subplot(projection='3d')
 
     cmap2 = LinearSegmentedColormap.from_list('redTransparentGreen', [(1, 0, 0, 1), (0.5, 1, 0.5, 0.1)])
+    legend_elements2 = [ax.scatter([0], [0], marker = 'o',c = 1, label='Label = 1',cmap=cmap2,vmin=0,vmax=1),
+                    ax.scatter([0], [0], marker = 's',c = 1,label='Label = 2',cmap=cmap2,vmin=0,vmax=1),
+                    ax.scatter([0], [0], marker = 'v',c = 1,label='Label = 3',cmap=cmap2,vmin=0,vmax=1),
+                    ax.scatter([0], [0], marker = 'x',c = 1,label='Label = 4',cmap=cmap2,vmin=0,vmax=1)]
 
     l12=ax2.scatter(data1[:,0],data1[:,1],zs=data1[:,2],marker = 'o',c = data1[:,5], label='Label = 1',cmap=cmap2,vmin=0,vmax=1)
     l22=ax2.scatter(data2[:,0],data2[:,1],zs=data2[:,2],marker = 's',c = data2[:,5], label='Label = 2',cmap=cmap2,vmin=0,vmax=1)
     l32=ax2.scatter(data3[:,0],data3[:,1],zs=data3[:,2],marker = 'v',c = data3[:,5], label='Label = 3',cmap=cmap2,vmin=0,vmax=1)
     l42=ax2.scatter(data4[:,0],data4[:,1],zs=data4[:,2],marker = 'x',c = data4[:,5], label='Label = 4',cmap=cmap2,vmin=0,vmax=1)
-
+    
     ax2.set_title(title2)
-    lg = ax2.legend(handles=[l12,l22,l32,l42],title="Red Marker = Incorrect Classification")
+    lg = ax2.legend(handles=legend_elements2,title="Red Marker = Incorrect Classification")
     for i in range(4):
         lg.legendHandles[i].set_alpha(1)
     plt.show()
 
 if __name__ == '__main__':
     lossMatrixA = np.ones((4,4)) - np.eye(4)
-    runPartA(lossMatrixA,'ERM Decision vs True Label','ERM Error vs True Label')
+    runPartA(lossMatrixA,'True PDF Classifier Decision vs True Label','True PDF Classifier Error vs True Label')

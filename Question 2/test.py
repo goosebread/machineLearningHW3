@@ -3,6 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import multivariate_normal
 
+#this function partitions a dataset into a train and test group 
+#according to the principles of k-fold validation
+def kPartition(data, ki, k, test):
+    #just steal the code from the custom dataset in q1
+
 dims = 2
 regWeight = 1e-5
 nGaussians=4
@@ -76,8 +81,9 @@ while (~converged):
 
 #evaluate fitting
 
+#use final mus, covs, priors to make gaussians and evaluate probability of seeing validation partition
 
 #consider plotting
-
+#see how they did the equiprobability contours in matlab
 
 print(mus)
