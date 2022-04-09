@@ -1,3 +1,6 @@
+# Alex Yeh
+# HW3 Question 1 true pdf classifier
+
 from q1_NN_model_selection import *
 from q1_truePDF_MAP import doVisualization
 import torch
@@ -10,6 +13,7 @@ from torch.utils.data import Dataset
 from torch.optim.lr_scheduler import StepLR
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
+
 class CustomDatasetFull(Dataset):
     def __init__(self, name):
         self.samples = np.load(open(name+'_Samples.npy', 'rb'))
@@ -94,7 +98,7 @@ if __name__ == '__main__':
                 if epoch==99:
                     print("Warning")
 
-            #loss for fully trained model
+            #average cross entropy loss for fully trained model
             #evaluate on the full set of training data
             loss = test(model, device, train_loader)
             if loss<min_loss:

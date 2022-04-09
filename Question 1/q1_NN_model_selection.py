@@ -1,5 +1,5 @@
-#Original Code from pytorch tutorial
-#modified by Alex Yeh
+#Base Code from pytorch tutorial
+#modified by Alex Yeh for HW3
 
 import argparse
 import torch
@@ -15,6 +15,7 @@ class CustomDataset(Dataset):
     #assuming k>1, ki starts counting from partition 0
     #assuming k<N
     def __init__(self, name, ki, k, validate):
+        #partition the dataset and store only a subset of the data
         all_samp = np.load(open(name+'_Samples.npy', 'rb'))
         all_lab = np.load(open(name+'_Labels.npy', 'rb'))
         N = all_lab.size
@@ -34,7 +35,7 @@ class CustomDataset(Dataset):
         sample = self.samples[idx]
         label = int(self.labels[idx][0])
         label_vec = np.zeros(4)#4 classes hard coded
-        label_vec[label-1]=1
+        label_vec[label-1]=1 #the label must be given in terms of a 4-d vector 
         return sample, label_vec
 
 #NN model for 2 Layer MLP with variable number of perceptrons in first hidden layer
@@ -103,7 +104,7 @@ def test(model, device, test_loader):
             test_loss += F.binary_cross_entropy(output, target, reduction='sum').item()  # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max probability
             label = target.argmax(dim=1, keepdim=True)  # get the index of the max probability
-            correct += (pred==label).sum() #pred.eq(target.view_as(pred)).sum().item()
+            correct += (pred==label).sum() 
 
     test_loss /= len(test_loader.dataset)
 
@@ -166,8 +167,6 @@ def evaluate_n_Perceptrons(n,k,train_set):
         model = Net(n).to(device)
         optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
-        #breakpoint()
-
         scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
         loss_old = -1     
 
@@ -193,16 +192,20 @@ if __name__ == '__main__':
     #model order selection
     k=10
     exponents = range(2,14,1) #2 to 13
-    n_values = np.power(2,exponents)
+    n_values = np.power(2,exponents) #4 to 8192
     results = pd.DataFrame(index = n_values)
 
     train_sets = ["D_train100","D_train200","D_train500","D_train1000","D_train2000","D_train5000"]
+    #check all training sets
     for t in range(len(train_sets)):
         train_set = train_sets[t]
-        #since we are using cross validation 
         losses = np.zeros(n_values.size)
+
+        #measure all perceptron options
         for i in range(n_values.size):
             losses[i] = evaluate_n_Perceptrons(n_values[i],k,train_set)
+
+        #choose perceptron option for lowest cross entropy
         m_idx = np.argmin(losses)
         results[train_set] = losses
         print("Training Set = "+train_set)

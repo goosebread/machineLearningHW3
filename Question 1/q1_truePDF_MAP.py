@@ -1,13 +1,12 @@
 # Alex Yeh
-# Question 2 Part A - 2,3
+# HW3 Question 1 true pdf classifier
 
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import multivariate_normal
-from sklearn.metrics import confusion_matrix
 from matplotlib.colors import LinearSegmentedColormap
 
-def runPartA(lossMatrix,title1,title2):
+def runClassifier(lossMatrix,title1,title2):
 
     #true data distribution is known for this ERM classifier
     distdata = np.load('Q1_DistData.npz')
@@ -17,8 +16,10 @@ def runPartA(lossMatrix,title1,title2):
     mvn3 = multivariate_normal(distdata['m3'],distdata['S3'])
     mvn4 = multivariate_normal(distdata['m4'],distdata['S4'])
 
+    #run model on test samples
     samples = np.load(open('D_test100000_Samples.npy', 'rb'))
 
+    #calculate class conditionals
     pxgivenL1 = mvn1.pdf(samples)
     pxgivenL2 = mvn2.pdf(samples)
     pxgivenL3 = mvn3.pdf(samples)
@@ -27,9 +28,7 @@ def runPartA(lossMatrix,title1,title2):
     #class priors are given and are uniform
     prior = 0.25
 
-    #p(x) can usually be factored out as a constant 
-    #but we need to estimate minimum expected risk in this problem
-    #so it's necessary to have the real class posteriors instead of something proportional
+    #calculate class posteriors
     px = (pxgivenL1+pxgivenL2+pxgivenL3+pxgivenL4)*prior
     pL1givenx = pxgivenL1 * prior / px
     pL2givenx = pxgivenL2 * prior / px
@@ -38,32 +37,21 @@ def runPartA(lossMatrix,title1,title2):
 
     #4xN matrix, each col represents probabilities for one sample
     P = np.stack((pL1givenx,pL2givenx,pL3givenx,pL4givenx))
-
     #Loss matrix for minimum total error
     L = lossMatrix
-
     #Risk vectors for each sample, 4xN matrix
     R = np.matmul(L,P)
     
     #Make Decisions based on minimum risk
     Decisions = np.array([np.argmin(R, axis=0)])+1
 
-    #Estimate minimum expected risk for using 100k samples
-    minRisks = R.min(axis=0)
-    expectedMinRisk = np.average(minRisks)
-    print("Minimum Expected Risk = "+str(expectedMinRisk))
-
-    #calculate confusion matrix (using sklearn library)
+    #plot and output measured error
     trueLabels = np.load(open('D_test100000_Labels.npy', 'rb')).T
-    CM = confusion_matrix((trueLabels-1)[0], (Decisions-1)[0], normalize = 'true')
-    print("Confusion Matrix: ")
-    print(CM)
-
     doVisualization(samples, trueLabels, Decisions, title1, title2)
 
 #Part 3 Visualizations
-#separate by true label
 def doVisualization(samples, trueLabels, Decisions, title1, title2):
+    #output measured error
     correctDecision = trueLabels==Decisions
     print("Measured Error = "+str(1-np.average(correctDecision)))
     data = np.concatenate((samples,trueLabels.T,Decisions.T,correctDecision.T),axis=1)
@@ -79,7 +67,6 @@ def doVisualization(samples, trueLabels, Decisions, title1, title2):
     data4 = np.reshape(data4,(data4.shape[0],data4.shape[2]))
 
     #plot Decisions vs Actual Label
-
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
     cmap1 = LinearSegmentedColormap.from_list('4class', [(1, 0, 0), (0, 1, 0), (1, 0, 1), (1, 1, 0),(0, 0, 1)])
@@ -95,9 +82,7 @@ def doVisualization(samples, trueLabels, Decisions, title1, title2):
     ax.set_title(title1)
     ax.legend(handles=legend_elements1,title="Shape = True Label\nColor = Classifier Decision")
 
-
     #plot Error vs Actual Label
-
     fig2 = plt.figure()
     ax2 = fig2.add_subplot(projection='3d')
 
@@ -119,5 +104,5 @@ def doVisualization(samples, trueLabels, Decisions, title1, title2):
     plt.show()
 
 if __name__ == '__main__':
-    lossMatrixA = np.ones((4,4)) - np.eye(4)
-    runPartA(lossMatrixA,'True PDF Classifier Decision vs True Label','True PDF Classifier Error vs True Label')
+    lossMatrix = np.ones((4,4)) - np.eye(4)#loss matrix for min probability of error (MAP)
+    runClassifier(lossMatrix,'True PDF Classifier Decision vs True Label','True PDF Classifier Error vs True Label')
