@@ -1,8 +1,6 @@
 #Alex Yeh
 #HW3
 #Question 2 Sample Generator
-#This script was run repeatedly until a sample set was generated that resulted in 
-#the true pdf MAP classifer achieving between 10-20% error in the test set
 
 import numpy as np
 
